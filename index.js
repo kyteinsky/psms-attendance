@@ -1,12 +1,13 @@
 const puppeteer = require("puppeteer");
 require("dotenv").config();
+const fs = require("fs");
 
 try {
   (async () => {
     const browser = await puppeteer.launch({
       executablePath: "/usr/bin/google-chrome-stable",
       // headless: false,
-      defaultViewport: null,
+      // defaultViewport: null,
       args: ["--window-size=1920,1080"],
     });
 
@@ -29,20 +30,33 @@ try {
 
     // We're IN
 
-    // selector just bcoz link might changein future
-    // const npbridge = await page.$("#page-container-2 > div > div > div > a");
-    // await npbridge.click();
-
-    // #page-container-x changes from 2 to 1 on another visit
-    // clicking on the button directly
-    await page.mouse.click(450, 600, { delay: 100 });
-
-    await page.waitForNavigation();
-
-    const attBtn = await page.$(
-      "#module-2384 > div > div > div:nth-child(2) > div.activity-information > div > button"
+    await page.goto(
+      "https://lms-practice-school.bits-pilani.ac.in/mod/attendance/view.php?id=2384"
     );
-    await attBtn.click();
+    // read count
+    let count;
+    fs.readFile("count", "utf-8", (err, data) => {
+      if (err) {
+        throw err;
+      }
+      count = data;
+    });
+
+    if (!count) {
+      throw "count is empty";
+    }
+    const attLink = await page.$(
+      `table.generaltable > tbody > tr:nth-child(${count})`
+    );
+    await attLink.click();
+
+    count++;
+    fs.writeFile("count", count, (err) => {
+      if (err) {
+        throw err;
+      }
+      console.log("count file written");
+    });
 
     console.log("attendance done ToT");
 
