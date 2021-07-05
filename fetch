@@ -1,0 +1,32 @@
+await fetch("https://lms-practice-school.bits-pilani.ac.in/mod/attendance/attendance.php", {
+    "credentials": "include",
+    "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-GPC": "1"
+    },
+    "referrer": "https://lms-practice-school.bits-pilani.ac.in/mod/attendance/attendance.php?sessid=12689&sesskey=59yVnRv0Bv",
+    "body": "sessid=12689&sesskey=59yVnRv0Bv&sesskey=59yVnRv0Bv&_qf__mod_attendance_form_studentattendance=1&mform_isexpanded_id_session=1&studentpassword=npb&status=1129&submitbutton=Save+changes",
+    "method": "POST",
+    "mode": "cors"
+});
+
+await fetch("https://lms-practice-school.bits-pilani.ac.in/lib/ajax/service.php?sesskey=59yVnRv0Bv&info=core_session_touch", {
+    "credentials": "include",
+    "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        "Sec-GPC": "1"
+    },
+    "referrer": "https://lms-practice-school.bits-pilani.ac.in/mod/attendance/view.php?id=2384",
+    "body": "[{\"index\":0,\"methodname\":\"core_session_touch\",\"args\":{}}]",
+    "method": "POST",
+    "mode": "cors"
+});
+

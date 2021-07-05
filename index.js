@@ -1,64 +1,67 @@
-const puppeteer = require("puppeteer");
-require("dotenv").config();
-const fs = require("fs");
+'use strict';
+
+// const puppeteer = require("puppeteer");
+// require("dotenv").config();
+// const fs = require("fs");
+const pptr = require("puppeteer-core");
 
 try {
   (async () => {
-    const browser = await puppeteer.launch({
-      executablePath: "/usr/bin/google-chrome-stable",
-      // headless: false,
-      // defaultViewport: null,
-      args: ["--window-size=1920,1080"],
+    // const browser = await puppeteer.launch({
+    //   executablePath: "/usr/bin/google-chrome-stable",
+    //   headless: false,
+    //   defaultViewport: null,
+    //   args: ["--window-size=1920,1080"],
+    // });
+
+    const browser = await pptr.launch({
+      executablePath: '/usr/bin/google-chrome-stable',
+      headless: false,
+      userDataDir: '/home/tyrell/.config/google-chrome/',
+      args: [
+        "--window-size=1920,1080",
+      ],
     });
 
-    // no session issues
-    const context = await browser.createIncognitoBrowserContext();
-    const page = await context.newPage();
-    await page.setDefaultNavigationTimeout(0);
+    const page = await browser.newPage();
+    page.setDefaultNavigationTimeout(0);
 
     await page.goto(
-      "https://lms-practice-school.bits-pilani.ac.in/login/index.php"
+      "https://lms-practice-school.bits-pilani.ac.in/login/index.php",
+      { waitUntil: 'networkidle0' }
     );
 
-    const userHandle = await page.$("#username");
-    await userHandle.type(process.env.username, { delay: 100 });
-    const passHandle = await page.$("#password");
-    await passHandle.type(process.env.pass, { delay: 120 });
-    await passHandle.press("Enter"); // submit the form
-
+    const googleButton = await page.$('div.potentialidp a.btn.btn-secondary.btn-block');
+    await googleButton.click();
     await page.waitForNavigation();
 
-    // We're IN
+    const f2019 = await page.$('li.JDAKTe:nth-child(4) > div:nth-child(1)')
+    await f2019.click();
+    await page.waitForNavigation();
 
     await page.goto(
-      "https://lms-practice-school.bits-pilani.ac.in/mod/attendance/view.php?id=2384"
+      "https://lms-practice-school.bits-pilani.ac.in/mod/attendance/view.php?id=2384",
+      { waitUntil: 'networkidle0' }
     );
-    // read count
-    let count;
-    fs.readFile("count", "utf-8", (err, data) => {
-      if (err) {
-        throw err;
-      }
-      count = data;
-    });
 
-    if (!count) {
-      throw "count is empty";
+    const submitAttBtn = await page.$x("//a[contains(., 'Submit')]")
+    if (submitAttBtn) {
+      await submitAttBtn.click();
+      await page.waitForNavigation();
+
+      const pswdField = await page.$('#id_studentpassword');
+      await pswdField.type('npb');
+      const presentCheck = await page.$('#id_status_1129');
+      await presentCheck.click();
+      const submitBtn = await page.$('#id_submitbutton')
+      await submitBtn.click();
+
+      console.log("attendance done ToT");
+      alert('okay done')
+    } else {
+      console.log('attendance not done');
+      alert('hello sir, please do it manually!');
     }
-    const attLink = await page.$(
-      `table.generaltable > tbody > tr:nth-child(${count})`
-    );
-    await attLink.click();
-
-    count++;
-    fs.writeFile("count", count, (err) => {
-      if (err) {
-        throw err;
-      }
-      console.log("count file written");
-    });
-
-    console.log("attendance done ToT");
 
     await browser.close();
   })();
