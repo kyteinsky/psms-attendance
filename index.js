@@ -1,86 +1,88 @@
 'use strict';
 
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer"),
+  fetch = require("node-fetch");
+
 require("dotenv").config();
 // const fs = require("fs");
 // const pptr = require("puppeteer-core");
 
-const fn = async () => {
-  const browser = await puppeteer.launch({
-    // executablePath: "/usr/bin/google-chrome-stable",
-    // headless: false,
-    defaultViewport: { 'width': 1920, 'height': 1080 }
-  });
 
-  // const browser = await pptr.launch({
-  //   executablePath: '/usr/bin/google-chrome-stable',
-  //   headless: false,
-  //   userDataDir: '/home/tyrell/.config/google-chrome/',
-  //   args: [
-  //     "--window-size=1920,1080",
-  //   ],
-  // });
+module.exports = async () => {
+  try {
+    const browser = await puppeteer.launch({
+      executablePath: "/usr/bin/google-chrome-stable",
+      // headless: false,
+      defaultViewport: { 'width': 1920, 'height': 1080 }
+    });
 
-  const page = await browser.newPage();
-  page.setDefaultNavigationTimeout(0);
+    // const browser = await pptr.launch({
+    //   executablePath: '/usr/bin/google-chrome-stable',
+    //   headless: false,
+    //   userDataDir: '/home/tyrell/.config/google-chrome/',
+    //   args: [
+    //     "--window-size=1920,1080",
+    //   ],
+    // });
 
-  await page.goto("https://lms-practice-school.bits-pilani.ac.in/mod/attendance/view.php?id=2384");
-  await page.waitForNavigation();
+    console.log('x');
+    const page = await browser.newPage();
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
 
-  const googleButton = await page.$('div.potentialidp a.btn.btn-secondary.btn-block');
-  await googleButton.click();
-  await page.waitForNavigation();
+    await page.goto("https://lms-practice-school.bits-pilani.ac.in/login/index.php", { waitUntil: 'networkidle2' });
+    console.log('y');
 
-  console.log(1);
+    const googleButton = await page.$('div.potentialidp a.btn.btn-secondary.btn-block');
+    await googleButton.click();
+    console.log('z');
+    await page.waitForNavigation();
+
+    console.log(1);
+    await page.screenshot({ path: 'ss.png' })
 
 
-  await page.type('#identifierId', process.env.googleId, { delay: 210 });
-  await page.keyboard.press('Enter');
+    await page.type('#identifierId', process.env.googleId, { delay: 210 });
+    await page.keyboard.press('Enter');
 
-  await page.waitForSelector('#password');
+    await page.waitForSelector('#password');
 
-  // using vanilla js
-  await page.evaluate((val) => {
-    document.querySelector("#password > div > div > div > input").value = val;
-    document.querySelector("#passwordNext > div > button").click();
-  }, process.env.googlePass);
+    // using vanilla js
+    await page.evaluate((val) => {
+      document.querySelector("#password > div > div > div > input").value = val;
+      document.querySelector("#passwordNext > div > button").click();
+    }, process.env.googlePass);
 
-  // const psField = await page.$("#password > div > div > div > input");
-  // console.log(1);
-  // await page.type('input[type="password"]', pasprocess.env.googlePasssword, { delay: 10 });
-  // await psField.type(process.env.googlePass);
-  // console.log(2);
-  // await page.keyboard.press('Enter');
-  // const nextBtn = await page.$("#passwordNext > div > button");
-  // await nextBtn.click();
-  
-  console.log(2);
-  await page.waitForNavigation();
+    console.log(2);
+    await page.waitForNavigation();
 
-  // const submitAttBtn = await page.$x("//a[contains(., 'Submit')]");
-  await page.evaluate(() => {
-    const getElementByXpath = (path) => document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    getElementByXpath("//a[contains(., 'Submit')]").click();
-  });
-  
-  // await submitAttBtn.click();
-  await page.waitForNavigation();
+    await page.goto("https://lms-practice-school.bits-pilani.ac.in/mod/attendance/view.php?id=2384", { waitUntil: 'networkidle2' });
 
-  console.log(3);
+    await page.screenshot({ path: 'ss2.png' })
+    
+    await page.evaluate(() => {
+      const getElementByXpath = (path) => document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      getElementByXpath("//a[contains(., 'Submit')]").click();
+    });
+    
+    await page.waitForNavigation();
 
-  const pswdField = await page.$('#id_studentpassword');
-  await pswdField.type('npb');
-  const presentCheck = await page.$('#id_status_1129');
-  await presentCheck.click();
-  const submitBtn = await page.$('#id_submitbutton')
-  await submitBtn.click();
+    console.log(3);
 
-  console.log("attendance done ToT");
-  alert('okay done')
+    const pswdField = await page.$('#id_studentpassword');
+    await pswdField.type('npb');
+    const presentCheck = await page.$('#id_status_1129');
+    await presentCheck.click();
+    const submitBtn = await page.$('#id_submitbutton')
+    await submitBtn.click();
 
-  await browser.close();
-};
+    console.log("attendance done ToT");
+    await page.screenshot({ path: 'ss3.png' })
 
-module.exports = {
-  fn,
+    await browser.close();
+
+    return 'completed successfully';
+  } catch (e) {
+    console.error(e);
+    return e;
+  }
 };

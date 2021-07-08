@@ -1,7 +1,14 @@
 'use strict';
 
-const { fn } = require('./index.js');
+require('dotenv').config();
+const fn = require('./index.js');
+const { bot , sendImages } = require('./telegram');
 
-//										year, month 0-11, date, hour, min (can add ,sec,msec)
-var eta_ms = new Date(2021,			6,			 7,		 9,		 0	).getTime() - Date.now();
-var timeout = setTimeout(() => fn(), eta_ms);
+bot.on('message', async (msg) => {
+	if (msg.text === 'dot') {
+		console.log('yes dot');
+		const res = await fn();
+		bot.sendMessage(msg.chat.id, res);
+		sendImages(msg.chat.id);
+	}
+});
