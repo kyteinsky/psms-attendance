@@ -12,7 +12,8 @@ module.exports = async () => {
   try {
     const browser = await puppeteer.launch({
       // executablePath: "/usr/bin/google-chrome-stable",
-      // headless: false,
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
       defaultViewport: { 'width': 1920, 'height': 1080 }
     });
 
@@ -65,7 +66,7 @@ module.exports = async () => {
       null
     ).singleNodeValue;
 
-    await page.evaluate((val) => {
+    await page.evaluate(() => {
       getElementByXpath("//a[contains(., 'Submit')]").scrollIntoView();
     });
     await page.screenshot({ path: 'ss2.png' })
