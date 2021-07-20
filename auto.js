@@ -11,7 +11,7 @@ require("dotenv").config();
 module.exports = async () => {
   try {
     const browser = await puppeteer.launch({
-      executablePath: "/usr/bin/google-chrome-stable",
+      // executablePath: "/usr/bin/google-chrome-stable",
       // headless: false,
       defaultViewport: { 'width': 1920, 'height': 1080 }
     });
@@ -57,10 +57,20 @@ module.exports = async () => {
 
     await page.goto("https://lms-practice-school.bits-pilani.ac.in/mod/attendance/view.php?id=2384", { waitUntil: 'networkidle2' });
 
+    const getElementByXpath = (path) => document.evaluate(
+      path,
+      document,
+      null,
+      XPathResult.FIRST_ORDERED_NODE_TYPE,
+      null
+    ).singleNodeValue;
+
+    await page.evaluate((val) => {
+      getElementByXpath("//a[contains(., 'Submit')]").scrollIntoView();
+    });
     await page.screenshot({ path: 'ss2.png' })
     
     await page.evaluate(() => {
-      const getElementByXpath = (path) => document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
       getElementByXpath("//a[contains(., 'Submit')]").click();
     });
     
@@ -76,13 +86,13 @@ module.exports = async () => {
     await submitBtn.click();
 
     console.log("attendance done ToT");
-    await page.screenshot({ path: 'ss3.png' })
+    const finalSS = await page.screenshot({ path: 'ss3.png' });
 
     await browser.close();
 
-    return 'completed successfully';
+    return [finalSS, 'completed successfully'];
   } catch (e) {
-    console.error(e);
-    return e;
+    console.log(e);
+    return [null, e];
   }
 };
