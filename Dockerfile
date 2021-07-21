@@ -12,7 +12,11 @@ RUN npm install
 # If you are building your code for production
 # RUN npm ci --only=production
 
+RUN apt-get update && apt-get install -y cron
+
 # Bundle app source
 COPY . .
 
-CMD [ "node", "server.js" ]
+RUN chmod +x entrypoint.sh
+
+ENTRYPOINT entrypoint.sh
